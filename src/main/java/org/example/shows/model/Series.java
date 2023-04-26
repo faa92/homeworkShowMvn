@@ -27,7 +27,7 @@ public class Series extends Show {
 
     @Override
     public String toString() {
-        return "[Сериал] %-40s  %s–%s  %s  %2ss  %3se  %.1f  %7s"
+        return "[Сериал] %-40s  %s–%s  %s  %2s  %3s  %.1f  %7s"
                 .formatted(title, releaseYear, lastSeasonRelease, countryCode, seasonsCount,
                         episodesCount, rating, marksCount);
     }
