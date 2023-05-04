@@ -24,11 +24,9 @@ public abstract class Show {
         this.rating = rating;
         this.marksCount = marksCount;
     }
-
     public String getTitle() {
         return title;
     }
-
     public Year getRealiseYear() {
         return releaseYear;
     }

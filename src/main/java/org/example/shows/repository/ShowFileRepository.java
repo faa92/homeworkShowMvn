@@ -5,6 +5,7 @@ import org.example.shows.model.Show;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -30,6 +31,14 @@ public class ShowFileRepository implements ShowRepository {
 
     private void readAllShows(List<Show> destination, Path path, ShowDeserializer deserializer) {
         Path seriesPath = repositoryProperties.getFileStorage().resolve(path);
+
+//        try (Stream<String> stringStreamCsv = Files.lines(path, StandardCharsets.UTF_8)) {
+//            destination.addAll(
+//                    stringStreamCsv
+//                    .map(deserializer::deserialize)
+//                    .toList());
+
+
         try (BufferedReader reader = Files.newBufferedReader(seriesPath)) {
             String csvLine = reader.readLine();
             while (csvLine != null) {
@@ -38,7 +47,7 @@ public class ShowFileRepository implements ShowRepository {
                 csvLine = reader.readLine();
             }
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new UncheckedIOException(e);
         }
     }
 }
