@@ -6,6 +6,7 @@ import org.example.shows.model.Show;
 import java.time.Year;
 
 public class FilmDeserializer implements ShowDeserializer {
+    public static final FilmDeserializer INSTANCE = new FilmDeserializer();
     @Override
     public Show deserialize(String line) {
         String[] parts = line.split(",");

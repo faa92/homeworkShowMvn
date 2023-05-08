@@ -3,13 +3,15 @@ package org.example.shows.repository;
 import org.example.shows.config.RepositoryProperties;
 import org.example.shows.model.Show;
 
-import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.UncheckedIOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class ShowFileRepository implements ShowRepository {
     private static final Path FILMS_FILE = Path.of("films.csv");
@@ -22,32 +24,23 @@ public class ShowFileRepository implements ShowRepository {
 
     @Override
     public List<Show> getAll() {
-        List<Show> shows = new ArrayList<>();
-        readAllShows(shows, FILMS_FILE, new FilmDeserializer());
-        readAllShows(shows, SERIES_FILE, new SeriesDeserializer());
+        try (
+                Stream<String> filmCsv = fileLines(FILMS_FILE);
+                Stream<String> seriesCsv = fileLines(SERIES_FILE)
+        ) {
+            return Stream.concat(
+                    filmCsv.map(FilmDeserializer.INSTANCE::deserialize),
+                    seriesCsv.map(SeriesDeserializer.INSTANCE::deserialize)
+            ).collect(Collectors.toCollection(ArrayList::new));
 
-        return shows;
-    }
-
-    private void readAllShows(List<Show> destination, Path path, ShowDeserializer deserializer) {
-        Path seriesPath = repositoryProperties.getFileStorage().resolve(path);
-
-//        try (Stream<String> stringStreamCsv = Files.lines(path, StandardCharsets.UTF_8)) {
-//            destination.addAll(
-//                    stringStreamCsv
-//                    .map(deserializer::deserialize)
-//                    .toList());
-
-
-        try (BufferedReader reader = Files.newBufferedReader(seriesPath)) {
-            String csvLine = reader.readLine();
-            while (csvLine != null) {
-                Show show = deserializer.deserialize(csvLine);
-                destination.add(show);
-                csvLine = reader.readLine();
-            }
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         }
     }
+
+    private Stream<String> fileLines(Path filePath) throws IOException {
+        return Files.lines(repositoryProperties.getFileStorage().resolve(filePath), StandardCharsets.UTF_8);
+    }
+
+
 }

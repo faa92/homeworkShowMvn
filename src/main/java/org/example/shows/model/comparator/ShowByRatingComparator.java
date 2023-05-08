@@ -7,7 +7,7 @@ import java.util.Comparator;
 public class ShowByRatingComparator implements Comparator<Show> {
     public static final Comparator<Show> INSTANCE = new ShowByRatingComparator();
 
-    public ShowByRatingComparator() {
+    private ShowByRatingComparator() {
     }
 
     @Override
